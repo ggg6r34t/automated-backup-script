@@ -1,9 +1,14 @@
 #!/bin/bash
 
 # Define variables
-source_dir="/path/to/source_directory"
-backup_dir="/path/to/backup_directory"
+source_dir="$1" #/path/to/source_directory
+backup_dir="$2" #/path/to/backup_directory
 max_backups=5
+
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 <source_directory> <backup_directory>"
+    exit 1
+fi
 
 # Create timestamp
 timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
