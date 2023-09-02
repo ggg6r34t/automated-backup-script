@@ -17,8 +17,30 @@ timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
 backup_folder="$backup_dir/backup_$timestamp"
 mkdir -p "$backup_folder"
 
-# Perform backup
-cp -r "$source_dir"/* "$backup_folder"
+# Function to display a progress bar
+print_progress() {
+    local width=40
+    local percentage=$(( $1 * 100 / $2 ))
+    local fill=$(( $width * $percentage / 100 ))
+    local progress_bar=$(printf '=%.0s' $(seq 1 $fill))
+
+    printf "\r[%-${width}s] %d%%" "$progress_bar" $percentage
+}
+
+# Count the number of files and directories in the source directory
+total_files=$(find "$source_dir" -type f | wc -l)
+
+# Show progress message
+echo "Backup in progress..."
+
+# Perform backup with progress
+copied=0
+for item in "$source_dir"/*; do
+    cp -r "$item" "$backup_folder"
+    copied=$((copied + 1))
+    print_progress $copied $total_files
+done
+echo # Move to a new line after the progress bar
 
 # Log actions
 log_file="$backup_dir/backup.log"
@@ -40,3 +62,6 @@ if [ ! -d "$source_dir" ]; then
     echo "Error: Source directory does not exist."
     exit 1
 fi
+
+# Return "Backup completed" message
+echo "Backup completed"
